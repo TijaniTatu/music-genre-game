@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Genre Guessing Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1e1e2f;
+            color: #f1f1f1;
+            max-width: 800px;
+            margin: auto;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #bcbcff;
+        }
+        .section {
+            background-color: #2b2b3d;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #444;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #bcbcff;
+        }
+        audio {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+        select, button {
+            width: 100%;
+            padding: 0.7rem;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+        }
+        select {
+            background-color: #3b3b51;
+            color: #f1f1f1;
+        }
+        button {
+            background-color: #5a5ad1;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #4848b8;
+        }
+        .result, .score {
+            padding: 1rem;
+            background-color: #2b2b3d;
+            border-radius: 10px;
+            border: 1px solid #444;
+            margin-top: 1rem;
+        }
+        .score {
+            font-size: 1.2rem;
+            color: #6da9ff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎶 Music Genre Guessing Game</h1>
+
+    <div class="section">
+        <label for="difficulty">🎛️ Select Difficulty</label>
+        <select id="difficulty">
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+        </select>
+        <button onclick="loadNewRound()">🎮 Next Round</button>
+    </div>
+
+    <div class="section">
+        <label>🎵 Listen to the Clip</label>
+        <audio id="audio-player" controls>
+            <source id="audio-source" src="" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <div class="section">
+        <form id="guess-form">
+            <label for="user-guess">Your Genre Guess</label>
+            <select id="user-guess" name="user_guess">
+                <option value="afrobeats">Afrobeats</option>
+                <option value="bongo">Bongo</option>
+                <option value="blues">Blues</option>
+                <option value="classical">Classical</option>
+                <option value="country">Country</option>
+                <option value="disco">Disco</option>
+                <option value="hiphop">HipHop</option>
+                <option value="rock">Rock</option>
+                <option value="jazz">Jazz</option>
+                <option value="metal">Metal</option>
+                <option value="pop">Pop</option>
+                <option value="reggae">Reggae</option>
+            </select>
+            <input type="hidden" id="spectrogram" name="spectrogram">
+            <input type="hidden" id="true-genre" name="true_genre">
+            <button type="submit">✅ Submit Guess</button>
+        </form>
+    </div>
+
+    <div class="result" id="result">{}</div>
+    <div class="score" id="score">👤 You: 0</div>
+
+    <script>
+        async function loadNewRound() {
+            const res = await fetch("/");
+            const text = await res.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, "text/html");
+            document.body.innerHTML = doc.body.innerHTML;
+        }
+
+        document.getElementById('guess-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const res = await fetch('/submit', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            document.getElementById('result').innerHTML = `
+                <p><strong>Correct Genre 🎧:</strong> ${data.correct_genre}</p>
+                <p><strong>Your Guess 🎮:</strong> ${data.user_guess} (${data.user_correct ? '✅' : '❌'})</p>
+                <p><strong>AI Guess 🤖:</strong> ${data.ai_guess} (${data.ai_correct ? '✅' : '❌'})</p>
+            `;
+
+            const currentScore = parseInt(document.getElementById('score').innerText.split(': ')[1]);
+            if (data.user_correct) {
+                document.getElementById('score').innerText = `👤 You: ${currentScore + 1}`;
+            }
+        };
+    </script>
+</body>
+</html>
