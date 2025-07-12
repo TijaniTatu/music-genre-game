@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Round Results</title>
+</head>
+<body>
+  <h1>📝 Results</h1>
+  <ul>
+    <li><strong>Correct Genre 🎧:</strong> {{ result["correct_genre"] }}</li>
+    <li><strong>Your Guess 🎮:</strong> {{ result["user_guess"] }} - {{ result["You"] }}</li>
+    <li><strong>AI Guess 🤖:</strong> {{ result["ai_guess"] }} - {{ result["AI"] }}</li>
+  </ul>
+  <a href="/">🔁 Play Another Round</a>
+</body>
+</html>

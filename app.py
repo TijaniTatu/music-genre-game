@@ -7,27 +7,39 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    song_path, true_genre = get_random_song()
-    spectrogram_path = song_path.replace("audio", "spectrograms").replace(".wav", ".png")
+    full_path, rel_web_path, true_genre = get_random_song()
+    spectrogram_path = full_path.replace("audio", "spectrograms").replace(".wav", ".png")
+
     return render_template("index.html", session={
-        "song_path": song_path,
+        "web_song_path": rel_web_path,
         "true_genre": true_genre,
         "spectrogram": spectrogram_path
     })
 
+
 @app.route('/submit', methods=['POST'])
 def submit():
-    user_guess = request.form["user_guess"]
-    spectrogram = request.form["spectrogram"]
-    true_genre = request.form["true_genre"]
+    user_guess = request.form.get("user_guess")
+    spectrogram = request.form.get("spectrogram")
+    true_genre = request.form.get("true_genre")
+
     ai_guess = predict_genre(spectrogram)
 
-    return jsonify({
+    result = {
         "correct_genre": true_genre,
         "user_guess": user_guess,
         "ai_guess": ai_guess,
         "user_correct": user_guess == true_genre,
         "ai_correct": ai_guess == true_genre
+    }
+
+    # Get the current song from hidden input or reload the song
+    song_path = request.form.get("song_path")
+    return render_template("index.html", session={
+        "web_song_path": song_path,
+        "true_genre": true_genre,
+        "spectrogram": spectrogram,
+        "result": result
     })
 
 if __name__ == "__main__":
