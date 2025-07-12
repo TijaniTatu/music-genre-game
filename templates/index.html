@@ -44,6 +44,17 @@
           {% if session.result.ai_correct %}✅{% else %}❌{% endif %}</li>
       </ul>
     </div>
+    <div class="scoreboard">
+  <h3>🏆 Scoreboard</h3>
+  <ul>
+    <li><strong>You 👤:</strong> {{ session.user_score }}</li>
+    <li><strong>AI 🤖:</strong> {{ session.ai_score }}</li>
+  </ul>
+</div>
   {% endif %}
+  <form method="GET" action="/">
+  <button type="submit">🔁 Next Round</button>
+</form>
+
 </body>
 </html>
